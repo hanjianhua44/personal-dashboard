@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import type { AppData, TodayTask, BacklogItem, AnnualGoal, TeamMember, TeamTask, Message } from '../types'
+import type { AppData, TodayTask, BacklogItem, AnnualGoal, TeamMember, TeamTask, Message, Idea } from '../types'
 import { loadData, saveData } from '../utils/storage'
 
 const DISMISSED_KEY = 'personal-dashboard-dismissed-msgs'
@@ -151,6 +151,22 @@ export function useAppData() {
     })
   }, [])
 
+  // Ideas
+  const addIdea = useCallback((idea: Idea) => {
+    setData(prev => ({ ...prev, ideas: [idea, ...prev.ideas] }))
+  }, [])
+
+  const updateIdea = useCallback((id: string, patch: Partial<Idea>) => {
+    setData(prev => ({
+      ...prev,
+      ideas: prev.ideas.map(i => i.id === id ? { ...i, ...patch } : i),
+    }))
+  }, [])
+
+  const deleteIdea = useCallback((id: string) => {
+    setData(prev => ({ ...prev, ideas: prev.ideas.filter(i => i.id !== id) }))
+  }, [])
+
   return {
     data,
     update,
@@ -161,5 +177,6 @@ export function useAppData() {
     addTeamMember, updateTeamMember, deleteTeamMember,
     addTeamTask, updateTeamTask, deleteTeamTask,
     addMessage, mergeMessages, updateMessage, deleteMessage, clearReadMessages,
+    addIdea, updateIdea, deleteIdea,
   }
 }

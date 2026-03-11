@@ -9,6 +9,7 @@ const defaultData: AppData = {
   teamMembers: [],
   teamTasks: [],
   messages: [],
+  ideas: [],
 }
 
 export function loadData(): AppData {

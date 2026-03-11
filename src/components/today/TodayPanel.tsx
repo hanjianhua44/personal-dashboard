@@ -48,6 +48,7 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
     })
 
   const doneCount = filtered.filter(t => t.completed).length
+  const progress = filtered.length > 0 ? Math.round((doneCount / filtered.length) * 100) : 0
 
   function shiftDate(days: number) {
     const d = new Date(selectedDate + 'T12:00:00')
@@ -107,41 +108,44 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
 
   return (
     <div className="overflow-hidden">
-      <div className="flex items-center justify-between mb-2 gap-2">
+      <div className="flex items-center justify-between mb-3 gap-2">
         <div className="min-w-0">
-          <h1 className="text-sm font-bold text-slate-800 truncate">今日重点</h1>
-          <p className="text-[10px] text-slate-500 truncate">
+          <h1 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+            <span className="text-base">🎯</span> 今日重点
+          </h1>
+          <p className="text-[10px] text-slate-500 truncate mt-0.5">
             {formatDisplayDate(selectedDate)}
-            {isToday && <span className="ml-1.5 text-primary-500 font-medium">TODAY</span>}
+            {isToday && <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-[9px] font-bold">TODAY</span>}
           </p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <button onClick={() => shiftDate(-1)} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
-            <ChevronLeft className="w-4 h-4 text-slate-500" />
+          <button onClick={() => shiftDate(-1)} className="p-1.5 rounded-lg hover:bg-indigo-50 transition-colors">
+            <ChevronLeft className="w-4 h-4 text-indigo-400" />
           </button>
           <button
             onClick={() => setSelectedDate(todayStr)}
-            className="px-2 py-1 text-xs rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
+            className="px-2.5 py-1 text-xs rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-medium transition-colors"
           >
             今天
           </button>
-          <button onClick={() => shiftDate(1)} className="p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
-            <ChevronRight className="w-4 h-4 text-slate-500" />
+          <button onClick={() => shiftDate(1)} className="p-1.5 rounded-lg hover:bg-indigo-50 transition-colors">
+            <ChevronRight className="w-4 h-4 text-indigo-400" />
           </button>
         </div>
       </div>
 
       {filtered.length > 0 && (
-        <div className="mb-2 flex items-center gap-2">
-          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="mb-3 flex items-center gap-2">
+          <div className="flex-1 h-2 bg-indigo-50 rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary-500 rounded-full transition-all duration-500"
-              style={{ width: `${(doneCount / filtered.length) * 100}%` }}
+              className="h-full bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full transition-all duration-700 ease-out"
+              style={{ width: `${progress}%` }}
             />
           </div>
-          <span className="text-xs text-slate-500 whitespace-nowrap">
+          <span className="text-xs font-semibold text-indigo-500 whitespace-nowrap">
             {doneCount}/{filtered.length}
           </span>
+          {progress === 100 && <span className="text-sm">🎉</span>}
         </div>
       )}
 
@@ -156,15 +160,14 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
               key={task.id}
               className={`rounded-xl border transition-all overflow-hidden ${
                 task.completed
-                  ? 'bg-slate-50 border-slate-100'
-                  : 'bg-white border-slate-200 shadow-sm'
+                  ? 'bg-emerald-50/50 border-emerald-100'
+                  : 'bg-white border-slate-200 shadow-sm hover:border-indigo-200 hover:shadow-md hover:shadow-indigo-50'
               }`}
             >
-              {/* Header */}
               <div className="group flex items-center gap-2 p-2.5">
                 <button
                   onClick={() => setExpandedTask(isExpanded ? null : task.id)}
-                  className="shrink-0 text-slate-400 hover:text-slate-600 transition-colors"
+                  className="shrink-0 text-slate-300 hover:text-indigo-500 transition-colors"
                 >
                   {isExpanded
                     ? <ChevronDown className="w-3.5 h-3.5" />
@@ -175,16 +178,16 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
                   type="checkbox"
                   checked={task.completed}
                   onChange={() => onUpdate(task.id, { completed: !task.completed })}
-                  className="w-4 h-4 rounded border-slate-300 text-primary-500 focus:ring-primary-400 cursor-pointer shrink-0"
+                  className="w-4 h-4 rounded-full border-slate-300 text-indigo-500 focus:ring-indigo-400 cursor-pointer shrink-0"
                 />
                 <div className="flex-1 min-w-0">
-                  <span className={`text-xs ${task.completed ? 'line-through text-slate-400' : 'text-slate-700'}`}>
-                    {task.title}
+                  <span className={`text-xs ${task.completed ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}`}>
+                    {task.completed && '✅ '}{task.title}
                   </span>
                   {(task.time || subtasks.length > 0) && (
                     <div className="flex items-center gap-1.5 mt-0.5">
                       {task.time && (
-                        <span className={`inline-flex items-center gap-0.5 text-[10px] ${task.completed ? 'text-slate-300' : 'text-slate-400'}`}>
+                        <span className={`inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full ${task.completed ? 'bg-slate-50 text-slate-300' : 'bg-amber-50 text-amber-600'}`}>
                           <Clock className="w-3 h-3" />{task.time}
                         </span>
                       )}
@@ -195,9 +198,9 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
                   )}
                 </div>
                 {subtasks.length > 0 && (
-                  <div className="w-12 h-1.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
+                  <div className="w-12 h-1.5 bg-indigo-50 rounded-full overflow-hidden shrink-0">
                     <div
-                      className="h-full bg-primary-400 rounded-full transition-all"
+                      className="h-full bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full transition-all"
                       style={{ width: `${(stDone / subtasks.length) * 100}%` }}
                     />
                   </div>
@@ -211,16 +214,15 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
                 </button>
               </div>
 
-              {/* Expanded */}
               {isExpanded && (
                 <div className="px-4 pb-3 pt-0 border-t border-slate-100">
-                  <p className="text-[10px] text-slate-400 font-semibold mt-2.5 mb-1.5 uppercase tracking-wider">子任务</p>
+                  <p className="text-[10px] text-indigo-400 font-semibold mt-2.5 mb-1.5 uppercase tracking-wider">子任务</p>
                   <div className="space-y-1">
                     {subtasks.map(st => (
                       <div key={st.id} className="group/st flex items-center gap-2 py-0.5">
                         <button onClick={() => toggleSubtask(task.id, st.id)} className="shrink-0">
                           {st.completed
-                            ? <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                            ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                             : <Circle className="w-3.5 h-3.5 text-slate-300" />
                           }
                         </button>
@@ -243,17 +245,17 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
                       onChange={e => setNewSubtask(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && addSubtask(task.id)}
                       placeholder="添加子任务..."
-                      className="flex-1 px-2 py-1 rounded border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
+                      className="flex-1 px-2 py-1 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
                     />
                     <button
                       onClick={() => addSubtask(task.id)}
-                      className="px-2 py-1 rounded text-xs bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      className="px-2 py-1 rounded-lg text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
                     >
                       添加
                     </button>
                   </div>
 
-                  <p className="text-[10px] text-slate-400 font-semibold mt-3 mb-1.5 uppercase tracking-wider">备注</p>
+                  <p className="text-[10px] text-indigo-400 font-semibold mt-3 mb-1.5 uppercase tracking-wider">备注</p>
                   {editingNote === task.id ? (
                     <div>
                       <textarea
@@ -261,18 +263,18 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
                         onChange={e => setNoteText(e.target.value)}
                         rows={2}
                         autoFocus
-                        className="w-full px-2 py-1.5 rounded border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent resize-none"
+                        className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent resize-none"
                         placeholder="记录备忘..."
                       />
                       <div className="flex justify-end gap-1.5 mt-1">
                         <button onClick={() => setEditingNote(null)} className="px-2 py-0.5 text-xs text-slate-400">取消</button>
-                        <button onClick={() => saveNote(task.id)} className="px-2 py-0.5 rounded text-xs bg-primary-500 text-white hover:bg-primary-600">保存</button>
+                        <button onClick={() => saveNote(task.id)} className="px-2 py-0.5 rounded-lg text-xs bg-gradient-to-r from-indigo-500 to-purple-500 text-white">保存</button>
                       </div>
                     </div>
                   ) : (
                     <div
                       onClick={() => startEditNote(task)}
-                      className="px-2 py-1.5 rounded bg-slate-50 text-xs text-slate-500 cursor-pointer hover:bg-slate-100 min-h-[1.5rem] whitespace-pre-wrap"
+                      className="px-2 py-1.5 rounded-lg bg-slate-50 text-xs text-slate-500 cursor-pointer hover:bg-indigo-50 min-h-[1.5rem] whitespace-pre-wrap transition-colors"
                     >
                       {task.note || <span className="text-slate-300 italic">点击添加备注...</span>}
                     </div>
@@ -285,14 +287,15 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
       </div>
 
       {filtered.length === 0 && !showInput && (
-        <div className="text-center py-8 text-slate-400">
-          <p className="text-xs mb-0.5">暂无任务</p>
-          <p className="text-xs">点击下方按钮添加今日目标</p>
+        <div className="text-center py-10 text-slate-400">
+          <div className="text-3xl mb-2 animate-float">📝</div>
+          <p className="text-xs font-medium mb-0.5">还没有安排任务</p>
+          <p className="text-[10px]">点击下方按钮，规划今天的目标吧</p>
         </div>
       )}
 
       {showInput ? (
-        <div className="mt-3 p-3 bg-white rounded-xl border border-slate-200 shadow-sm">
+        <div className="mt-3 p-3 bg-white rounded-xl border border-indigo-100 shadow-lg shadow-indigo-50">
           <input
             type="text"
             value={newTitle}
@@ -300,7 +303,7 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
             placeholder="输入目标内容..."
             autoFocus
-            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
+            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
           />
           <div className="flex items-center justify-between mt-2 gap-2">
             <div className="flex items-center gap-2 flex-wrap min-w-0">
@@ -309,13 +312,15 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
                   <button
                     key={p}
                     onClick={() => setNewPriority(p)}
-                    className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                    className={`px-2 py-0.5 rounded-lg text-xs font-medium transition-all ${
                       newPriority === p
-                        ? 'bg-primary-500 text-white'
+                        ? p === 'high' ? 'bg-gradient-to-r from-red-500 to-rose-400 text-white shadow-sm'
+                          : p === 'medium' ? 'bg-gradient-to-r from-amber-500 to-orange-400 text-white shadow-sm'
+                          : 'bg-gradient-to-r from-emerald-500 to-teal-400 text-white shadow-sm'
                         : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                     }`}
                   >
-                    {p === 'high' ? '高' : p === 'medium' ? '中' : '低'}
+                    {p === 'high' ? '🔴 高' : p === 'medium' ? '🟡 中' : '🟢 低'}
                   </button>
                 ))}
               </div>
@@ -323,7 +328,7 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
                 type="time"
                 value={newTime}
                 onChange={e => setNewTime(e.target.value)}
-                className="px-1.5 py-0.5 rounded border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent"
+                className="px-1.5 py-0.5 rounded-lg border border-slate-200 text-xs text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
               />
             </div>
             <div className="flex gap-1.5 shrink-0">
@@ -335,7 +340,7 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
               </button>
               <button
                 onClick={handleAdd}
-                className="px-3 py-1 rounded-lg text-xs bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+                className="px-3 py-1 rounded-lg text-xs bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:shadow-lg hover:shadow-indigo-200 transition-all"
               >
                 添加
               </button>
@@ -345,7 +350,7 @@ export default function TodayPanel({ tasks, onAdd, onUpdate, onDelete }: Props) 
       ) : (
         <button
           onClick={() => setShowInput(true)}
-          className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border-2 border-dashed border-slate-200 text-slate-400 hover:border-primary-300 hover:text-primary-500 transition-colors"
+          className="mt-3 w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-2 border-dashed border-indigo-200 text-indigo-400 hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all"
         >
           <Plus className="w-4 h-4" />
           <span className="text-xs font-medium">添加目标</span>

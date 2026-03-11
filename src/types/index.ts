@@ -67,6 +67,15 @@ export interface TeamTask {
   createdAt: string
 }
 
+export interface Idea {
+  id: string
+  title: string
+  detail: string
+  tags: string[]
+  starred: boolean
+  createdAt: string
+}
+
 export type MessageType = 'info' | 'success' | 'warning' | 'error'
 
 export interface Message {
@@ -85,6 +94,7 @@ export interface AppData {
   teamMembers: TeamMember[]
   teamTasks: TeamTask[]
   messages: Message[]
+  ideas: Idea[]
 }
 
-export type ViewType = 'overview' | 'team' | 'settings'
+export type ViewType = 'overview' | 'annual' | 'team' | 'ideas' | 'settings'
