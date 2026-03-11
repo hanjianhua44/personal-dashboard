@@ -1,13 +1,28 @@
-import { useState, useCallback, useEffect } from 'react'
-import type { AppData, TodayTask, BacklogItem, AnnualGoal, TeamMember, TeamTask } from '../types'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import type { AppData, TodayTask, BacklogItem, AnnualGoal, TeamMember, TeamTask, Message } from '../types'
 import { loadData, saveData } from '../utils/storage'
+
+const DISMISSED_KEY = 'personal-dashboard-dismissed-msgs'
+
+function loadDismissed(): Set<string> {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]'))
+  } catch {
+    return new Set()
+  }
+}
 
 export function useAppData() {
   const [data, setData] = useState<AppData>(loadData)
+  const dismissed = useRef(loadDismissed())
 
   useEffect(() => {
     saveData(data)
   }, [data])
+
+  function saveDismissed() {
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify([...dismissed.current]))
+  }
 
   const update = useCallback(<K extends keyof AppData>(key: K, value: AppData[K]) => {
     setData(prev => ({ ...prev, [key]: value }))
@@ -101,6 +116,41 @@ export function useAppData() {
     setData(prev => ({ ...prev, teamTasks: prev.teamTasks.filter(t => t.id !== id) }))
   }, [])
 
+  // Messages
+  const addMessage = useCallback((msg: Message) => {
+    setData(prev => ({ ...prev, messages: [msg, ...prev.messages] }))
+  }, [])
+
+  const mergeMessages = useCallback((msgs: Message[]) => {
+    setData(prev => {
+      const existingIds = new Set(prev.messages.map(m => m.id))
+      const newMsgs = msgs.filter(m => !existingIds.has(m.id) && !dismissed.current.has(m.id))
+      if (newMsgs.length === 0) return prev
+      return { ...prev, messages: [...newMsgs, ...prev.messages].sort((a, b) => b.createdAt.localeCompare(a.createdAt)) }
+    })
+  }, [])
+
+  const updateMessage = useCallback((id: string, patch: Partial<Message>) => {
+    setData(prev => ({
+      ...prev,
+      messages: prev.messages.map(m => m.id === id ? { ...m, ...patch } : m),
+    }))
+  }, [])
+
+  const deleteMessage = useCallback((id: string) => {
+    dismissed.current.add(id)
+    saveDismissed()
+    setData(prev => ({ ...prev, messages: prev.messages.filter(m => m.id !== id) }))
+  }, [])
+
+  const clearReadMessages = useCallback(() => {
+    setData(prev => {
+      prev.messages.filter(m => m.read).forEach(m => dismissed.current.add(m.id))
+      saveDismissed()
+      return { ...prev, messages: prev.messages.filter(m => !m.read) }
+    })
+  }, [])
+
   return {
     data,
     update,
@@ -110,5 +160,6 @@ export function useAppData() {
     addAnnualGoal, updateAnnualGoal, deleteAnnualGoal,
     addTeamMember, updateTeamMember, deleteTeamMember,
     addTeamTask, updateTeamTask, deleteTeamTask,
+    addMessage, mergeMessages, updateMessage, deleteMessage, clearReadMessages,
   }
 }

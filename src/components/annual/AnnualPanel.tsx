@@ -71,18 +71,18 @@ export default function AnnualPanel({ goals, onAdd, onUpdate, onDelete }: Props)
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">{year} 年度目标</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-sm font-bold text-slate-800">{year} 年度目标</h1>
+          <p className="text-[10px] text-slate-500">
             {completedCount}/{yearGoals.length} 个目标已完成
           </p>
         </div>
       </div>
 
       {yearGoals.length > 0 && (
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+        <div className="mb-2 flex items-center gap-2">
+          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500"
               style={{ width: `${yearGoals.length > 0 ? (completedCount / yearGoals.length) * 100 : 0}%` }}
@@ -190,7 +190,7 @@ export default function AnnualPanel({ goals, onAdd, onUpdate, onDelete }: Props)
 
       {yearGoals.length === 0 && !showInput && (
         <div className="text-center py-12 text-slate-400">
-          <p className="text-lg mb-1">还没有设定年度目标</p>
+          <p className="text-sm mb-1">还没有设定年度目标</p>
           <p className="text-sm">新的一年，设定一些值得追求的目标吧</p>
         </div>
       )}

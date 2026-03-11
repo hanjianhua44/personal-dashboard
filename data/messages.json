@@ -1,0 +1,18 @@
+[
+  {
+    "id": "mmleotuv3p8s44",
+    "content": "Cursor Agent 完成了 personal-dashboard 消息模块开发",
+    "source": "cursor",
+    "type": "info",
+    "read": false,
+    "createdAt": "2026-03-11T02:14:44.263Z"
+  },
+  {
+    "id": "mmleonte50kwr6",
+    "content": "arXiv 每日抓取完成，新增 8 篇 VLA 论文",
+    "source": "awesome-vla-papers",
+    "type": "success",
+    "read": false,
+    "createdAt": "2026-03-11T02:14:36.434Z"
+  }
+]

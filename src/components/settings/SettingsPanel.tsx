@@ -46,7 +46,7 @@ export default function SettingsPanel({ data, onImport }: Props) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">设置</h1>
+      <h1 className="text-lg font-bold text-slate-800 mb-5">设置</h1>
 
       <div className="space-y-6">
         {/* Stats */}
@@ -61,7 +61,7 @@ export default function SettingsPanel({ data, onImport }: Props) {
               { label: '团队任务', count: stats.teamTasks },
             ].map(s => (
               <div key={s.label} className="text-center p-3 bg-slate-50 rounded-lg">
-                <p className="text-2xl font-bold text-slate-800">{s.count}</p>
+                <p className="text-xl font-bold text-slate-800">{s.count}</p>
                 <p className="text-xs text-slate-500 mt-0.5">{s.label}</p>
               </div>
             ))}
